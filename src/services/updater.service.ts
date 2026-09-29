@@ -16,8 +16,24 @@ const updateState: AppUpdateState = {
 
 
 autoUpdater.autoDownload = false
-autoUpdater.autoInstallOnAppQuit = true
+autoUpdater.autoInstallOnAppQuit = false
 autoUpdater.allowPrerelease = false
+
+function friendlyUpdateError(error: unknown): string {
+  console.error('Error del actualizador:', error)
+  const message = error instanceof Error ? error.message : String(error)
+
+  if (/ENOTFOUND|ECONNREFUSED|ETIMEDOUT|ECONNRESET|EAI_AGAIN|ERR_INTERNET_DISCONNECTED|ERR_NETWORK|ERR_CONNECTION/i.test(message)) {
+    return 'No hay conexión a internet. Comprueba tu conexión e inténtalo de nuevo.'
+  }
+  if (/403|rate limit/i.test(message)) {
+    return 'Se hicieron demasiadas consultas seguidas. Inténtalo de nuevo en unos minutos.'
+  }
+  if (/404|latest\.yml|No published versions/i.test(message)) {
+    return 'Todavía no hay información de actualizaciones disponible. Inténtalo más tarde.'
+  }
+  return 'No pudimos comprobar si hay actualizaciones. Inténtalo de nuevo más tarde.'
+}
 
 export function setUpdateState(patch: Partial<AppUpdateState>) {
   Object.assign(updateState, patch)
@@ -35,11 +51,8 @@ export async function checkForAppUpdates() {
   setUpdateState({ status: 'checking', currentVersion: app.getVersion(), error: null })
   try {
     await autoUpdater.checkForUpdates()
-  } catch (error) {
-    setUpdateState({
-      status: 'error',
-      error: error instanceof Error ? error.message : String(error)
-    })
+  } catch (err) {
+    setUpdateState({ status: 'error', error: friendlyUpdateError(err) })
   }
   return { ...updateState }
 }
@@ -58,10 +71,7 @@ export async function downloadAppUpdate() {
     try {
         await autoUpdater.downloadUpdate()
     } catch(err) {
-        setUpdateState({
-            status: 'error',
-            error: err instanceof Error ? err.message : String(err)
-        })
+        setUpdateState({ status: 'error', error: friendlyUpdateError(err) })
     }
 
     return { ...updateState }
@@ -122,5 +132,5 @@ autoUpdater.on('update-downloaded', (info) => {
 })
 
 autoUpdater.on('error', (error) => {
-  setUpdateState({ status: 'error', error: error.message })
+  setUpdateState({ status: 'error', error: friendlyUpdateError(error) })
 })

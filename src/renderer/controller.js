@@ -308,7 +308,7 @@ function renderUpdates() {
           ${!downloading && !downloaded && update.status !== 'development' ? `<button type="button" data-update-action="check" ${update.status === 'checking' ? 'disabled' : ''} class="min-h-[36px] rounded-[7px] border border-line px-4 text-[11px] text-text-soft transition hover:border-[#42423a] hover:bg-paper-light hover:text-text disabled:opacity-40">Buscar actualizaciones</button>` : ''}
         </div>
       </section>
-      ${available || downloaded || (upToDate && notes) ? `
+      ${available || downloaded || upToDate ? `
         <section class="mt-7">
           <h3 class="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted">${upToDate ? 'RELEASE INSTALADO' : 'NOVEDADES DE LA VERSIÓN'} ${escapeHtml(update.version || '')}</h3>
           <pre class="mt-3 whitespace-pre-wrap font-sans text-[12px] leading-6 text-text-soft">${escapeHtml(notes || 'Este release no incluye notas adicionales.')}</pre>
