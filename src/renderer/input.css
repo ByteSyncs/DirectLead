@@ -1,0 +1,219 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-paper: #11110f;
+  --color-paper-soft: #171714;
+  --color-paper-light: #1d1d19;
+  --color-line: #2b2b26;
+  --color-line-soft: #23231f;
+  --color-text: #e7e5df;
+  --color-text-soft: #a4a39b;
+  --color-text-muted: #686861;
+  --color-accent: #b8c79c;
+  --color-accent-dark: #8ea36e;
+  --color-danger: #c98080;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-line);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  color: var(--color-text);
+}
+
+.legal-document {
+  color: var(--color-text-soft);
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.legal-document h1 {
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--color-line);
+  padding-bottom: 14px;
+  color: var(--color-text);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 23px;
+  font-weight: 400;
+}
+
+.legal-document h2 {
+  margin-top: 24px;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.legal-document p {
+  margin-top: 10px;
+}
+
+.legal-document ul,
+.legal-document ol {
+  margin: 10px 0;
+  padding-left: 22px;
+}
+
+.legal-document li + li {
+  margin-top: 5px;
+}
+
+.legal-document strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.legal-document code {
+  border-radius: 3px;
+  background: var(--color-paper-light);
+  padding: 1px 4px;
+  color: var(--color-text);
+  font-size: 11px;
+}
+
+.legal-document a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.sheet-stack {
+  position: relative;
+  perspective: 1600px;
+}
+
+.sheet-stack::before,
+.sheet-stack::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  border: 1px solid var(--color-line-soft);
+}
+
+.sheet-stack::before {
+  background: #131311;
+  transform: translate(7px, 7px) rotate(0.35deg);
+}
+
+.sheet-stack::after {
+  background: #151512;
+  transform: translate(3.5px, 3.5px) rotate(-0.2deg);
+}
+
+.sheet {
+  position: relative;
+  z-index: 1;
+  border-radius: 3px;
+  border: 1px solid var(--color-line);
+  background: var(--color-paper-soft);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+
+.sheet::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 34px;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle at 17px 44px,
+    #0c0c0a 6.5px,
+    rgba(0, 0, 0, 0.55) 7.5px,
+    transparent 9px
+  );
+  background-size: 34px 190px;
+  background-repeat: repeat-y;
+}
+
+.sheet::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 66px;
+  width: 3px;
+  pointer-events: none;
+  border-left: 1px solid rgba(201, 128, 128, 0.28);
+  border-right: 1px solid rgba(201, 128, 128, 0.28);
+}
+
+.ruled {
+  line-height: 32px;
+  background-image: linear-gradient(
+    to bottom,
+    transparent 31px,
+    rgba(255, 255, 255, 0.07) 31px,
+    rgba(255, 255, 255, 0.07) 32px
+  );
+  background-size: 100% 32px;
+  background-attachment: local;
+}
+
+@keyframes page-turn-next {
+  0% {
+    transform: rotateY(-34deg) translateX(26px);
+    opacity: 0;
+    filter: brightness(0.7);
+  }
+  100% {
+    transform: rotateY(0) translateX(0);
+    opacity: 1;
+    filter: brightness(1);
+  }
+}
+
+@keyframes page-turn-prev {
+  0% {
+    transform: rotateY(34deg) translateX(-26px);
+    opacity: 0;
+    filter: brightness(0.7);
+  }
+  100% {
+    transform: rotateY(0) translateX(0);
+    opacity: 1;
+    filter: brightness(1);
+  }
+}
+
+.page-turn-next {
+  transform-origin: left center;
+  animation: page-turn-next 440ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.page-turn-prev {
+  transform-origin: right center;
+  animation: page-turn-prev 440ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@media (max-width: 800px) {
+  .sheet::after {
+    left: 46px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-turn-next,
+  .page-turn-prev {
+    animation: none;
+  }
+}

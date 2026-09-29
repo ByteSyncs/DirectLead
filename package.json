@@ -1,0 +1,90 @@
+{
+  "name": "DirectLead",
+  "version": "1.0.0",
+  "productName": "DirectLead",
+  "description": "Desktop application to organize prospects and prepare outreach messages.",
+  "main": "./dist/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc && pnpm build:css && pnpm copy:renderer",
+    "build:css": "pnpm exec tailwindcss -i ./src/renderer/input.css -o ./dist/renderer/styles.css",
+    "copy:renderer": "node scripts/copy-renderer.mjs",
+    "package:win": "pnpm build && electron-builder --win nsis --x64",
+    "package:win:dir": "pnpm build && electron-builder --win dir --x64",
+    "postinstall": "electron-builder install-app-deps",
+    "watch": "tsc --watch",
+    "watch:renderer": "chokidar \"src/renderer/index.html\" \"src/renderer/controller.js\" \"docs/legal/*.md\" -c \"pnpm copy:renderer\"",
+    "dev:css": "pnpm exec tailwindcss -i ./src/renderer/input.css -o ./dist/renderer/styles.css --watch",
+    "start": "electronmon .",
+    "dev": "pnpm build && concurrently \"pnpm watch\" \"pnpm dev:css\" \"pnpm watch:renderer\" \"pnpm start\""
+  },
+  "keywords": [],
+  "author": "ByteSyncs",
+  "license": "ISC",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.6.0",
+      "onFail": "download"
+    }
+  },
+  "packageManager": "pnpm@12.6.0",
+  "type": "module",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@tailwindcss/cli": "^4.3.3",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^26.6.2",
+    "chokidar-cli": "^3.0.0",
+    "concurrently": "^10.0.5",
+    "electron": "^44.4.5",
+    "electron-builder": "^26.15.3",
+    "electronmon": "^2.0.4",
+    "eslint": "^10.11.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.9",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "typescript-eslint": "^8.70.1"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "marked": "^18.0.14"
+  },
+  "build": {
+    "appId": "com.bytesyncs.directlead",
+    "productName": "DirectLead",
+    "asar": true,
+    "asarUnpack": [
+      "**/*.node"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "win": {
+      "icon": "src/assets/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "${productName}-${version}-Setup.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "DirectLead"
+    }
+  }
+}

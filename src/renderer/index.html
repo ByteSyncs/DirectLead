@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#11110f" />
+    <meta
+    http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
+    />
+    <title>DirectLead</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+
+  <body class="h-screen w-full overflow-hidden bg-paper font-sans text-text antialiased">
+    <div id="app-root" class="flex h-full min-h-0 w-full bg-paper max-[800px]:flex-col">
+      <div
+        aria-hidden="true"
+        class="hidden w-[14px] shrink-0 border-r border-line bg-paper-soft bg-[radial-gradient(circle,rgba(255,255,255,0.07)_1.4px,transparent_1.6px)] bg-[length:100%_24px] bg-[position:0_6px] min-[801px]:block"
+      ></div>
+
+      <nav
+        id="rail"
+        aria-label="Secciones"
+        class="relative flex h-full w-[60px] shrink-0 flex-col items-center border-r border-line bg-paper-soft/70 py-5 max-[800px]:h-14 max-[800px]:w-full max-[800px]:flex-row max-[800px]:justify-center max-[800px]:gap-2 max-[800px]:border-b max-[800px]:border-r-0 max-[800px]:py-0"
+      >
+        <button
+          id="rail-prospects"
+          type="button"
+          aria-label="Prospectos"
+          title="Prospectos"
+          class="relative grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-paper-light text-accent transition duration-150 focus:outline-none focus:ring-1 focus:ring-accent/40"
+        >
+          <span class="absolute left-[-13px] top-1/2 h-4 w-[2.5px] -translate-y-1/2 rounded-full bg-accent max-[800px]:hidden" data-rail-marker></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-[19px] w-[19px]" aria-hidden="true">
+            <rect x="4" y="3" width="16" height="18" rx="2"></rect>
+            <path d="M8 8h5"></path>
+            <path d="M8 12h8"></path>
+            <path d="M8 16h8"></path>
+          </svg>
+        </button>
+
+        <button
+          id="rail-settings"
+          type="button"
+          aria-label="Configuración"
+          title="Configuración"
+          class="relative mt-auto grid h-10 w-10 shrink-0 place-items-center rounded-lg text-text-muted transition duration-150 hover:bg-paper-light hover:text-text focus:outline-none focus:ring-1 focus:ring-accent/40 max-[800px]:mt-0"
+        >
+          <span class="absolute left-[-13px] top-1/2 hidden h-4 w-[2.5px] -translate-y-1/2 rounded-full bg-accent max-[800px]:hidden" data-rail-marker></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-[19px] w-[19px]" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </nav>
+
+      <aside
+        id="list-pane"
+        class="relative flex h-full min-w-0 flex-col overflow-hidden border-r border-line bg-paper/95 max-[800px]:h-auto max-[800px]:w-full max-[800px]:flex-1 max-[800px]:border-r-0"
+        style="width: 380px"
+      >
+        <div id="view-prospects" class="flex h-full min-h-0 flex-col">
+          <header class="flex items-start justify-between px-6 pb-5 pt-7 max-[560px]:px-5 max-[560px]:pb-4 max-[560px]:pt-5">
+            <div>
+              <p class="mb-1.5 text-[10px] font-semibold uppercase leading-none tracking-[0.16em] text-text-muted">LIBRETA</p>
+              <h1 class="font-serif text-[26px] font-normal leading-none tracking-[-0.02em] text-text">Prospectos</h1>
+            </div>
+
+            <button
+              id="new-prospect-button"
+              type="button"
+              aria-label="Nuevo prospecto"
+              title="Nuevo prospecto (N)"
+              class="mt-0.5 grid h-9 w-9 place-items-center rounded-lg border border-line bg-transparent text-[19px] font-light text-text-soft transition duration-150 hover:border-[#414139] hover:bg-paper-light hover:text-text focus:outline-none focus:ring-1 focus:ring-accent/40"
+            >
+              +
+            </button>
+          </header>
+
+          <div class="relative mx-5 mb-1 max-[560px]:mx-4">
+            <svg class="pointer-events-none absolute left-[13px] top-1/2 h-[15px] w-[15px] -translate-y-1/2 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="m20 20-4-4"></path>
+            </svg>
+
+            <input
+              id="search-input"
+              type="search"
+              placeholder="Buscar por teléfono..."
+              autocomplete="off"
+              spellcheck="false"
+              class="h-[40px] w-full rounded-lg border border-line bg-paper-soft pl-[36px] pr-[46px] text-[13px] text-text outline-none transition duration-150 placeholder:text-text-muted focus:border-[#47473f] focus:bg-paper-light"
+            />
+
+            <button
+              id="palette-trigger"
+              type="button"
+              title="Buscar todo (Ctrl+K)"
+              class="absolute right-[6px] top-1/2 -translate-y-1/2 rounded-md border border-line bg-paper px-[6px] py-[3px] text-[10px] font-medium text-text-muted transition duration-150 hover:border-[#414139] hover:text-text-soft"
+            >
+              ⌘K
+            </button>
+          </div>
+
+          <div class="flex min-h-[38px] items-center gap-[9px] px-6 text-[10px] tracking-[0.04em] text-text-muted max-[560px]:px-5">
+            <span id="prospect-count">0 prospectos</span>
+            <span class="h-[3px] w-[3px] rounded-full bg-[#46463e]"></span>
+            <span id="list-status">Todos</span>
+          </div>
+
+          <section id="prospect-list" aria-label="Lista de prospectos" class="min-h-0 flex-1 overflow-y-auto px-3 pb-5 max-[560px]:px-2"></section>
+
+          <div id="empty-list" hidden class="flex min-h-[180px] flex-1 flex-col items-center justify-center px-5 py-5 text-center text-text-muted">
+            <span class="mb-[14px] font-serif text-[26px] text-[#45453e]">—</span>
+            <p class="mb-[5px] font-serif text-[15px] text-text-soft">No hay prospectos</p>
+            <span class="text-[11px]">Agregá uno para comenzar.</span>
+          </div>
+        </div>
+
+        <div id="view-settings" hidden class="flex h-full min-h-0 flex-col">
+          <header class="px-6 pb-5 pt-7 max-[560px]:px-5 max-[560px]:pb-4 max-[560px]:pt-5">
+            <p class="mb-1.5 text-[10px] font-semibold uppercase leading-none tracking-[0.16em] text-text-muted">AJUSTES</p>
+            <h1 class="font-serif text-[26px] font-normal leading-none tracking-[-0.02em] text-text">Configuración</h1>
+          </header>
+
+          <section id="settings-list" aria-label="Lista de ajustes" class="min-h-0 flex-1 overflow-y-auto px-3 pb-5 max-[560px]:px-2"></section>
+        </div>
+      </aside>
+
+      <div
+        id="resize-handle"
+        role="separator"
+        aria-orientation="vertical"
+        aria-valuemin="280"
+        aria-valuemax="640"
+        aria-valuenow="380"
+        aria-label="Ajustar ancho de la lista"
+        title="Arrastrá para ajustar el ancho"
+        tabindex="0"
+        class="hidden w-[6px] shrink-0 cursor-col-resize bg-transparent transition-colors duration-150 hover:bg-accent/20 min-[801px]:block"
+      ></div>
+
+      <section id="detail-panel" class="relative h-full min-w-0 flex-1 overflow-hidden bg-[#0e0e0c] max-[800px]:h-auto max-[800px]:flex-1">
+        <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(184,199,156,0.05),transparent_65%)]"></div>
+
+        <button
+          id="mobile-back"
+          type="button"
+          hidden
+          class="absolute left-4 top-4 z-20 flex items-center gap-1.5 rounded-md border border-line bg-paper-soft px-3 py-1.5 text-[11px] text-text-soft transition duration-150 hover:border-[#414139] hover:text-text"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5"><path d="m15 18-6-6 6-6"></path></svg>
+          Volver
+        </button>
+
+        <div id="detail-empty" class="relative z-10 flex h-full items-center justify-center overflow-y-auto px-6 py-10">
+          <div class="sheet-stack w-full max-w-[460px]">
+            <div class="sheet">
+              <div class="relative pb-10 pl-[92px] pr-8 pt-10 max-[800px]:pl-[60px]">
+                <h2 class="mb-2 font-serif text-[24px] font-normal tracking-[-0.02em] text-text-soft">Hoja en blanco</h2>
+                <p class="max-w-[300px] text-[12px] leading-[1.7] text-text-muted">Elegí un prospecto de la libreta o creá uno nuevo con la tecla N.</p>
+                <div class="ruled mt-8 h-[128px]"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <article id="prospect-detail" hidden class="relative z-10 h-full overflow-y-auto px-10 py-6 max-[1050px]:px-6 max-[800px]:px-3 max-[800px]:pb-6 max-[800px]:pt-[56px]">
+          <div class="sheet-stack mx-auto w-full max-w-[820px]">
+            <div id="page" class="sheet">
+              <span aria-hidden="true" class="absolute right-3 top-0 z-[2] h-[52px] w-[15px] bg-accent-dark [clip-path:polygon(0_0,100%_0,100%_100%,50%_80%,0_100%)] max-[800px]:hidden"></span>
+
+              <div class="relative min-h-[calc(100vh-48px)] pb-6 pl-[92px] pr-9 pt-6 max-[800px]:min-h-[calc(100vh-80px)] max-[800px]:pl-[60px] max-[800px]:pr-5">
+                <header class="flex flex-wrap items-start justify-between gap-4 border-b border-dashed border-line pb-4">
+                  <div class="min-w-0 flex-1">
+                    <span class="mb-2 block text-[10px] font-semibold uppercase leading-none tracking-[0.16em] text-text-muted">PROSPECTO</span>
+
+                    <h2
+                      id="detail-business-name"
+                      data-field="business_name"
+                      class="-mx-1 rounded px-1 font-serif text-[clamp(26px,3vw,36px)] font-normal leading-[1.15] tracking-[-0.03em] text-text outline-none transition duration-150 hover:bg-paper-light/60 focus:bg-paper-light"
+                    ></h2>
+
+                    <span
+                      id="detail-phone"
+                      data-field="phone"
+                      class="-mx-1 mt-[10px] inline-block rounded px-1 text-[13px] text-text-soft outline-none transition duration-150 hover:bg-paper-light/60 hover:text-accent focus:bg-paper-light"
+                    ></span>
+                    <span
+                      id="detail-email"
+                      data-field="email"
+                      class="-mx-1 mt-1 inline-block rounded px-1 text-[12px] text-text-muted outline-none transition duration-150 hover:bg-paper-light/60 hover:text-accent focus:bg-paper-light"
+                    ></span>
+                  </div>
+
+                  <div class="flex flex-wrap items-center gap-2 pt-2 max-[560px]:w-full">
+                    <button
+                      id="whatsapp-button"
+                      type="button"
+                      class="flex min-h-[36px] items-center gap-[7px] rounded-[7px] border border-accent bg-accent px-[13px] text-[11px] font-semibold text-[#171812] transition duration-150 hover:border-[#c8d5af] hover:bg-[#c8d5af] focus:outline-none focus:ring-2 focus:ring-accent/30 max-[560px]:flex-1 max-[560px]:justify-center"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-[14px] w-[14px]" aria-hidden="true">
+                        <path d="M20 11.5a8 8 0 0 1-11.8 7L4 20l1.5-4A8 8 0 1 1 20 11.5Z"></path>
+                        <path d="M8.5 9.5c.7 1.6 1.8 2.7 3.4 3.4"></path>
+                      </svg>
+                      WhatsApp
+                    </button>
+
+                    <button
+                      id="email-button"
+                      type="button"
+                      class="flex min-h-[36px] items-center gap-[7px] rounded-[7px] border border-line bg-paper px-[13px] text-[11px] font-medium text-text-soft transition duration-150 hover:border-[#42423a] hover:bg-paper-light hover:text-text focus:outline-none focus:ring-1 focus:ring-accent/40 max-[560px]:flex-1 max-[560px]:justify-center"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-[14px] w-[14px]">
+                        <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                        <path d="m4 7 8 6 8-6"></path>
+                      </svg>
+                      Email
+                    </button>
+
+                    <button
+                      id="edit-button"
+                      type="button"
+                      title="Editar todos los campos"
+                      class="min-h-[36px] rounded-[7px] border border-line bg-transparent px-[13px] text-[11px] font-medium text-text-soft transition duration-150 hover:border-[#42423a] hover:bg-paper-light hover:text-text focus:outline-none focus:ring-1 focus:ring-accent/40 max-[560px]:flex-1"
+                    >
+                      Editar
+                    </button>
+
+                    <button
+                      id="delete-button"
+                      type="button"
+                      class="min-h-[36px] rounded-[7px] border border-danger/20 bg-transparent px-[13px] text-[11px] font-medium text-danger transition duration-150 hover:border-danger/30 hover:bg-danger/10 hover:text-[#dda0a0] focus:outline-none focus:ring-1 focus:ring-danger/30 max-[560px]:flex-1"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </header>
+
+                <section class="border-b border-dashed border-line py-4">
+                  <div class="grid grid-cols-2 gap-x-[42px] gap-y-3 max-[560px]:grid-cols-1">
+                    <div class="flex flex-col gap-[6px]">
+                      <span class="text-[10px] uppercase tracking-[0.12em] text-text-muted">Anotado</span>
+                      <strong id="info-created" class="font-serif text-[15px] font-normal italic text-text-soft"></strong>
+                    </div>
+
+                    <div class="flex flex-col gap-[6px]">
+                      <span class="text-[10px] uppercase tracking-[0.12em] text-text-muted">Contactado</span>
+                      <strong id="info-contacted" class="font-serif text-[15px] font-normal italic text-text-soft"></strong>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="border-b border-dashed border-line py-4">
+                  <div class="mb-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted">
+                    Link
+                    <span class="h-[3px] w-[3px] rounded-full bg-[#3a3a33]"></span>
+                    <span class="normal-case tracking-normal text-[#565650]">opcional</span>
+                  </div>
+
+                  <div class="flex items-center gap-2">
+                    <div
+                      id="detail-url"
+                      data-field="url"
+                      class="h-8 min-w-0 flex-1 overflow-x-auto whitespace-nowrap rounded px-1 text-[13px] leading-8 text-text-soft outline-none transition duration-150 empty:before:pointer-events-none empty:before:text-text-muted/60 empty:before:content-['Pegá_un_link_si_querés_guardarlo'] hover:bg-paper-light/60 focus:bg-paper-light"
+                    ></div>
+
+                    <button
+                      id="open-url-button"
+                      type="button"
+                      title="Abrir link"
+                      aria-label="Abrir link"
+                      class="grid h-8 w-8 shrink-0 place-items-center rounded-md border border-line text-text-soft transition duration-150 hover:border-[#414139] hover:bg-paper-light hover:text-accent"
+                    >
+                      <svg class="h-[14px] w-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                        <path d="M7 17 17 7"></path>
+                        <path d="M8 7h9v9"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </section>
+
+                <section class="border-b border-dashed border-line py-4">
+                  <div class="mb-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted">
+                    Mensaje
+                    <span class="h-[3px] w-[3px] rounded-full bg-[#3a3a33]"></span>
+                    <span class="normal-case tracking-normal text-[#565650]">plantilla de WhatsApp</span>
+                  </div>
+
+                  <div
+                    id="detail-message"
+                    data-field="message"
+                    class="ruled min-h-[96px] whitespace-pre-wrap rounded px-1 text-[13px] text-text-soft outline-none transition duration-150 [overflow-wrap:anywhere] focus:bg-accent/[0.03]"
+                  ></div>
+                </section>
+
+                <section class="py-4">
+                  <div class="mb-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted">
+                    Notas
+                    <span class="h-[3px] w-[3px] rounded-full bg-[#3a3a33]"></span>
+                    <span class="normal-case tracking-normal text-[#565650]">escribí acá</span>
+                  </div>
+
+                  <div
+                    id="detail-notes"
+                    data-field="notes"
+                    class="ruled min-h-[96px] whitespace-pre-wrap rounded px-1 text-[13px] text-text-muted outline-none transition duration-150 [overflow-wrap:anywhere] empty:before:pointer-events-none empty:before:text-text-muted/50 empty:before:content-['Sin_notas_todavía'] focus:bg-accent/[0.03] focus:text-text-soft"
+                  ></div>
+                </section>
+
+                <footer class="mt-2 flex items-center justify-between border-t border-dashed border-line pt-4">
+                  <button
+                    id="page-prev"
+                    type="button"
+                    class="rounded-md px-2 py-1.5 text-[11px] text-text-soft transition duration-150 hover:bg-paper-light hover:text-text disabled:pointer-events-none disabled:opacity-30"
+                  >
+                    ‹ Hoja anterior
+                  </button>
+
+                  <span id="page-counter" class="font-serif text-[12px] italic text-text-muted">Hoja 1 de 1</span>
+
+                  <button
+                    id="page-next"
+                    type="button"
+                    class="rounded-md px-2 py-1.5 text-[11px] text-text-soft transition duration-150 hover:bg-paper-light hover:text-text disabled:pointer-events-none disabled:opacity-30"
+                  >
+                    Hoja siguiente ›
+                  </button>
+                </footer>
+              </div>
+
+              <span aria-hidden="true" class="pointer-events-none absolute bottom-0 right-0 h-7 w-7 bg-[linear-gradient(135deg,#2a2a24_50%,#0e0e0c_50%)]"></span>
+            </div>
+          </div>
+        </article>
+
+        <article id="settings-detail" hidden class="relative z-10 h-full overflow-y-auto px-10 py-10 max-[1050px]:px-6 max-[800px]:px-3 max-[800px]:pb-8 max-[800px]:pt-[64px]"></article>
+      </section>
+    </div>
+
+    <div id="modal-backdrop" hidden class="fixed inset-0 z-[100] grid place-items-center bg-black/70 p-[25px] backdrop-blur-[8px] max-[560px]:p-3">
+      <div role="dialog" aria-modal="true" aria-labelledby="modal-title" class="max-h-[calc(100vh-50px)] w-full max-w-[600px] overflow-y-auto rounded-[10px] border border-[#33332d] bg-paper-soft p-7 shadow-[0_25px_80px_rgba(0,0,0,0.42)] max-[560px]:max-h-[calc(100vh-24px)] max-[560px]:p-[22px]">
+        <header class="mb-7 flex items-start justify-between">
+          <div>
+            <span id="modal-label" class="mb-2 block text-[10px] font-semibold uppercase leading-none tracking-[0.16em] text-text-muted">NUEVO</span>
+            <h2 id="modal-title" class="font-serif text-[25px] font-normal tracking-[-0.025em] text-text">Nuevo prospecto</h2>
+          </div>
+
+          <button id="modal-close" type="button" aria-label="Cerrar" class="grid h-8 w-8 place-items-center rounded-md bg-transparent text-[22px] font-light text-text-muted transition duration-150 hover:bg-paper-light hover:text-text focus:outline-none focus:ring-1 focus:ring-accent/40">×</button>
+        </header>
+
+        <form id="prospect-form">
+          <input id="form-id" type="hidden" />
+
+          <div class="grid grid-cols-2 gap-[18px] max-[560px]:grid-cols-1">
+            <label class="col-span-full flex flex-col gap-2 max-[560px]:col-span-1">
+              <span class="text-[11px] font-medium text-text-soft">Empresa</span>
+              <input id="form-business-name" type="text" required maxlength="120" autocomplete="organization" class="h-[41px] w-full rounded-md border border-line bg-paper px-3 text-[12px] text-text outline-none transition duration-150 placeholder:text-[#55554e] focus:border-[#4a4a41] focus:bg-[#141411] focus:ring-1 focus:ring-accent/20" />
+            </label>
+
+            <label class="flex flex-col gap-2">
+              <span class="text-[11px] font-medium text-text-soft">Teléfono</span>
+              <input id="form-phone" type="tel" required maxlength="40" autocomplete="tel" class="h-[41px] w-full rounded-md border border-line bg-paper px-3 text-[12px] text-text outline-none transition duration-150 placeholder:text-[#55554e] focus:border-[#4a4a41] focus:bg-[#141411] focus:ring-1 focus:ring-accent/20" />
+            </label>
+
+            <label class="flex flex-col gap-2">
+              <span class="text-[11px] font-medium text-text-soft">Email <span class="text-text-muted">(opcional)</span></span>
+              <input id="form-email" type="email" maxlength="160" autocomplete="email" placeholder="contacto@empresa.com" class="h-[41px] w-full rounded-md border border-line bg-paper px-3 text-[12px] text-text outline-none transition duration-150 placeholder:text-[#55554e] focus:border-[#4a4a41] focus:bg-[#141411] focus:ring-1 focus:ring-accent/20" />
+            </label>
+
+            <label class="flex flex-col gap-2">
+              <span class="text-[11px] font-medium text-text-soft">Contactado</span>
+              <input id="form-contacted-at" type="datetime-local" required class="h-[41px] w-full rounded-md border border-line bg-paper px-3 text-[12px] text-text outline-none transition duration-150 focus:border-[#4a4a41] focus:bg-[#141411] focus:ring-1 focus:ring-accent/20 [color-scheme:dark]" />
+            </label>
+
+            <label class="col-span-full flex flex-col gap-2 max-[560px]:col-span-1">
+              <span class="text-[11px] font-medium text-text-soft">Link <span class="text-text-muted">(opcional)</span></span>
+              <input id="form-url" type="url" placeholder="https://..." class="h-[41px] w-full rounded-md border border-line bg-paper px-3 text-[12px] text-text outline-none transition duration-150 placeholder:text-[#55554e] focus:border-[#4a4a41] focus:bg-[#141411] focus:ring-1 focus:ring-accent/20" />
+            </label>
+
+            <label class="col-span-full flex flex-col gap-2 max-[560px]:col-span-1">
+              <span class="text-[11px] font-medium text-text-soft">Mensaje</span>
+              <textarea id="form-message" rows="5" required class="min-h-[90px] w-full resize-y rounded-md border border-line bg-paper px-3 py-[11px] text-[12px] leading-[1.55] text-text outline-none transition duration-150 placeholder:text-[#55554e] focus:border-[#4a4a41] focus:bg-[#141411] focus:ring-1 focus:ring-accent/20"></textarea>
+            </label>
+
+            <label class="col-span-full flex flex-col gap-2 max-[560px]:col-span-1">
+              <span class="text-[11px] font-medium text-text-soft">Notas</span>
+              <textarea id="form-notes" rows="4" placeholder="Información adicional..." class="min-h-[90px] w-full resize-y rounded-md border border-line bg-paper px-3 py-[11px] text-[12px] leading-[1.55] text-text outline-none transition duration-150 placeholder:text-[#55554e] focus:border-[#4a4a41] focus:bg-[#141411] focus:ring-1 focus:ring-accent/20"></textarea>
+            </label>
+          </div>
+
+          <section id="modal-actions" hidden class="mt-5 rounded-lg border border-line bg-paper px-4 py-3">
+            <div class="mb-3">
+              <p class="text-[11px] font-medium text-text-soft">Acciones de contacto</p>
+              <p class="mt-1 text-[10.5px] leading-[1.5] text-text-muted">Usá las plantillas configuradas y abrí tu aplicación predeterminada.</p>
+            </div>
+            <div class="grid grid-cols-2 gap-2 max-[560px]:grid-cols-1">
+              <button id="modal-whatsapp-button" type="button" class="flex min-h-[38px] items-center justify-center gap-2 rounded-[7px] border border-accent bg-accent px-3 text-[11px] font-semibold text-[#171812] transition duration-150 hover:bg-[#c8d5af]">
+                WhatsApp
+              </button>
+              <button id="modal-email-button" type="button" class="flex min-h-[38px] items-center justify-center gap-2 rounded-[7px] border border-line bg-paper-soft px-3 text-[11px] font-medium text-text-soft transition duration-150 hover:border-[#42423a] hover:bg-paper-light hover:text-text">
+                Email
+              </button>
+            </div>
+          </section>
+
+          <footer class="mt-[25px] flex justify-end gap-2 border-t border-line pt-5 max-[560px]:sticky max-[560px]:bottom-[-22px] max-[560px]:-mx-[22px] max-[560px]:mb-[-22px] max-[560px]:bg-paper-soft max-[560px]:px-[22px] max-[560px]:pb-[22px] max-[560px]:pt-[15px]">
+            <button id="modal-cancel" type="button" class="min-h-[37px] rounded-[7px] border border-line bg-transparent px-[14px] text-[11px] font-medium text-text-soft transition duration-150 hover:border-[#42423a] hover:bg-paper-light hover:text-text focus:outline-none focus:ring-1 focus:ring-accent/40">Cancelar</button>
+            <button type="submit" class="min-h-[37px] rounded-[7px] border border-accent bg-accent px-[14px] text-[11px] font-semibold text-[#171812] transition duration-150 hover:border-[#c8d5af] hover:bg-[#c8d5af] focus:outline-none focus:ring-2 focus:ring-accent/30">
+              <span id="submit-label">Guardar prospecto</span>
+            </button>
+          </footer>
+        </form>
+      </div>
+    </div>
+
+    <div id="legal-backdrop" hidden class="fixed inset-0 z-[120] grid place-items-center bg-black/70 p-6 backdrop-blur-[8px] max-[560px]:p-3">
+      <section role="dialog" aria-modal="true" aria-labelledby="legal-title" class="flex max-h-[calc(100vh-48px)] w-full max-w-[760px] flex-col overflow-hidden rounded-[10px] border border-[#33332d] bg-paper-soft shadow-[0_25px_80px_rgba(0,0,0,0.48)] max-[560px]:max-h-[calc(100vh-24px)]">
+        <header class="flex items-start justify-between gap-4 border-b border-line px-6 py-5 max-[560px]:px-4">
+          <div>
+            <p class="mb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-text-muted">DOCUMENTO DE DIRECTLEAD</p>
+            <h2 id="legal-title" class="font-serif text-[22px] text-text">Documento legal</h2>
+          </div>
+          <button id="legal-close" type="button" aria-label="Cerrar documento" class="grid h-8 w-8 shrink-0 place-items-center rounded-md text-[20px] text-text-muted transition hover:bg-paper-light hover:text-text focus:outline-none focus:ring-1 focus:ring-accent/40">×</button>
+        </header>
+        <article id="legal-content" class="legal-document min-h-0 overflow-y-auto px-7 py-6 max-[560px]:px-4"></article>
+        <footer class="flex justify-end border-t border-line px-6 py-4 max-[560px]:px-4">
+          <button type="button" data-legal-close class="min-h-[36px] rounded-[7px] border border-line px-4 text-[11px] text-text-soft transition hover:border-[#42423a] hover:bg-paper-light hover:text-text">Cerrar</button>
+        </footer>
+      </section>
+    </div>
+
+    <div id="palette-backdrop" hidden class="fixed inset-0 z-[110] flex items-start justify-center bg-black/70 px-4 pt-[12vh] backdrop-blur-[8px]">
+      <div role="dialog" aria-modal="true" aria-label="Buscar" class="w-full max-w-[560px] overflow-hidden rounded-[12px] border border-[#33332d] bg-paper-soft shadow-[0_25px_80px_rgba(0,0,0,0.5)]">
+        <div class="flex items-center gap-3 border-b border-line px-5 py-4">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-[16px] w-[16px] shrink-0 text-text-muted" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-4-4"></path>
+          </svg>
+          <input id="palette-input" type="text" placeholder="Buscar un prospecto o una acción..." autocomplete="off" spellcheck="false" class="h-6 w-full bg-transparent text-[14px] text-text outline-none placeholder:text-text-muted" />
+          <kbd class="rounded border border-line px-[6px] py-[2px] text-[10px] text-text-muted">Esc</kbd>
+        </div>
+
+        <div id="palette-results" class="max-h-[340px] overflow-y-auto p-2"></div>
+      </div>
+    </div>
+
+    <div id="toast" aria-live="polite" class="pointer-events-none fixed bottom-6 right-6 z-[200] max-w-[360px] translate-y-2 rounded-[7px] border border-[#393931] bg-[#22221e] px-[15px] py-[11px] text-[11px] leading-[1.5] text-text opacity-0 shadow-[0_15px_40px_rgba(0,0,0,0.3)] transition duration-200"></div>
+
+    <script type="module" src="./controller.js"></script>
+  </body>
+</html>

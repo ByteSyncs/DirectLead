@@ -1,0 +1,5 @@
+allowBuilds:
+  '@parcel/watcher': false
+  better-sqlite3: false
+  electron-winstaller: false
+  esbuild: false
