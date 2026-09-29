@@ -41,11 +41,27 @@
         </button>
 
         <button
+          id="rail-updates"
+          type="button"
+          aria-label="Actualizaciones"
+          title="Actualizaciones"
+          class="relative mt-auto mb-2 grid h-10 w-10 shrink-0 place-items-center rounded-lg text-text-muted transition duration-150 hover:bg-paper-light hover:text-text focus:outline-none focus:ring-1 focus:ring-accent/40 max-[800px]:mt-0 max-[800px]:mb-0"
+        >
+          <span class="absolute left-[-13px] top-1/2 hidden h-4 w-[2.5px] -translate-y-1/2 rounded-full bg-accent max-[800px]:hidden" data-rail-marker></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-[19px] w-[19px]" aria-hidden="true">
+            <path d="M12 3v12"></path>
+            <path d="m7 10 5 5 5-5"></path>
+            <path d="M5 20h14"></path>
+          </svg>
+          <span id="update-badge" hidden aria-label="Nueva actualización disponible" class="absolute right-0 top-0 grid h-[15px] min-w-[15px] place-items-center rounded-full bg-[#f0c75e] px-1 text-[9px] font-bold leading-none text-[#171812]">!</span>
+        </button>
+
+        <button
           id="rail-settings"
           type="button"
           aria-label="Configuración"
           title="Configuración"
-          class="relative mt-auto grid h-10 w-10 shrink-0 place-items-center rounded-lg text-text-muted transition duration-150 hover:bg-paper-light hover:text-text focus:outline-none focus:ring-1 focus:ring-accent/40 max-[800px]:mt-0"
+          class="relative grid h-10 w-10 shrink-0 place-items-center rounded-lg text-text-muted transition duration-150 hover:bg-paper-light hover:text-text focus:outline-none focus:ring-1 focus:ring-accent/40 max-[800px]:mt-0"
         >
           <span class="absolute left-[-13px] top-1/2 hidden h-4 w-[2.5px] -translate-y-1/2 rounded-full bg-accent max-[800px]:hidden" data-rail-marker></span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="h-[19px] w-[19px]" aria-hidden="true">
@@ -425,8 +441,26 @@
           <button id="legal-close" type="button" aria-label="Cerrar documento" class="grid h-8 w-8 shrink-0 place-items-center rounded-md text-[20px] text-text-muted transition hover:bg-paper-light hover:text-text focus:outline-none focus:ring-1 focus:ring-accent/40">×</button>
         </header>
         <article id="legal-content" class="legal-document min-h-0 overflow-y-auto px-7 py-6 max-[560px]:px-4"></article>
-        <footer class="flex justify-end border-t border-line px-6 py-4 max-[560px]:px-4">
-          <button type="button" data-legal-close class="min-h-[36px] rounded-[7px] border border-line px-4 text-[11px] text-text-soft transition hover:border-[#42423a] hover:bg-paper-light hover:text-text">Cerrar</button>
+        <footer class="border-t border-line px-6 py-4 max-[560px]:px-4">
+          <div id="terms-footer" hidden class="space-y-4">
+            <label id="terms-consent" hidden class="flex items-start gap-2 text-[11px] leading-5 text-text-soft">
+              <input id="terms-checkbox" type="checkbox" disabled class="mt-1 accent-[#b8c79c]" />
+              <span>Leí y acepto los Términos de Uso de DirectLead. Entiendo que mi aceptación se guarda localmente en este dispositivo.</span>
+            </label>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div class="flex flex-wrap gap-2">
+                <button id="terms-privacy" type="button" hidden class="min-h-[36px] px-2 text-[11px] text-accent underline underline-offset-4">Leer Privacidad</button>
+                <button id="terms-return" type="button" hidden class="min-h-[36px] px-2 text-[11px] text-accent underline underline-offset-4">Volver a Términos</button>
+              </div>
+              <div class="flex gap-2">
+                <button id="terms-reject" type="button" class="min-h-[36px] rounded-[7px] border border-line px-4 text-[11px] text-text-soft transition hover:border-[#42423a] hover:bg-paper-light hover:text-text">No acepto · Salir</button>
+                <button id="terms-accept" type="button" disabled class="min-h-[36px] rounded-[7px] border border-accent bg-accent px-4 text-[11px] font-semibold text-[#171812] transition enabled:hover:bg-[#c8d5af] disabled:cursor-not-allowed disabled:opacity-40">Acepto y continuar</button>
+              </div>
+            </div>
+          </div>
+          <div id="legal-footer-close" class="flex justify-end">
+            <button type="button" data-legal-close class="min-h-[36px] rounded-[7px] border border-line px-4 text-[11px] text-text-soft transition hover:border-[#42423a] hover:bg-paper-light hover:text-text">Cerrar</button>
+          </div>
         </footer>
       </section>
     </div>

@@ -76,7 +76,7 @@ Keybindings are saved locally. The Shortcuts section allows restoring default va
 - When opening WhatsApp, email, or external links, necessary data is passed to the selected external service. That service's respective policies apply.
 - Uninstalling the app may not automatically delete local data. Please maintain your own backups and secure your machine.
 
-Specific legal documents can be found at [`docs/legal/privacy.md`](docs/legal/privacy.md) and [`docs/legal/terms.md`](docs/legal/terms.md). These are **drafts pending legal review** and do not constitute legal advice or finalized public documents.
+DirectLead's own privacy policy and terms of use are available in [`docs/legal/privacy.md`](docs/legal/privacy.md) and [`docs/legal/terms.md`](docs/legal/terms.md). On first launch, the app requires users to accept the Terms to continue. Acceptance is stored locally by document version.
 
 If remote storage or cloud synchronization is added in the future, the app and its documentation will be updated to outline data handling prior to transmission and require explicit user consent.
 
@@ -133,7 +133,7 @@ src/
   renderer/               UI logic, controllers, and Tailwind styles
   services/               Application services
   types/                  Shared TypeScript types and window API definitions
-docs/legal/               Draft legal documents (privacy and terms)
+docs/legal/               DirectLead privacy policy and terms of use
 scripts/                  Build scripts for copying assets to the dist directory
 
 ```

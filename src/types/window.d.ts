@@ -3,6 +3,7 @@ import type {
   Prospect,
   UpdateProspect
 } from './prospects.js'
+import type { AppUpdateState } from './updater.js'
 
 declare global {
   interface Window {
@@ -20,6 +21,12 @@ declare global {
       isWhatsAppDesktopInstalled: () => Promise<boolean>
       getLegalDocument: (documentId: 'privacy' | 'terms') => Promise<string>
       toggleFullscreen: () => Promise<boolean>
+      quitApp: () => Promise<void>
+      getUpdateState: () => Promise<AppUpdateState>
+      checkForUpdates: () => Promise<AppUpdateState>
+      downloadUpdate: () => Promise<AppUpdateState>
+      installUpdate: () => Promise<boolean>
+      onUpdateState: (callback: (state: AppUpdateState) => void) => () => void
     }
   }
 }

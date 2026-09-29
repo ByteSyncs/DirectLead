@@ -14,6 +14,8 @@ import {
 } from './database/prospects.repository.js'
 import { registerProspectsIpc } from './ipc/prospects.ipc.js'
 import { registerWhatsAppIpc } from './ipc/whatsapp.ipc.js'
+import { registerUpdaterIpc } from './ipc/updater.ipc.js'
+import { checkForAppUpdates } from './services/updater.service.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -21,6 +23,8 @@ const legalDocuments = {
   privacy: 'privacy.md',
   terms: 'terms.md'
 } as const
+
+
 
 ipcMain.handle('legal:get', async (_event, documentId: unknown) => {
   if (typeof documentId !== 'string' || !Object.hasOwn(legalDocuments, documentId)) {
@@ -38,6 +42,11 @@ ipcMain.handle('window:toggle-fullscreen', (event) => {
   window.setFullScreen(!window.isFullScreen())
   return window.isFullScreen()
 })
+
+ipcMain.handle('app:quit', () => {
+  app.quit()
+})
+
 
 let mainWindow: BrowserWindow | null = null
 
@@ -65,14 +74,18 @@ function createWindow() {
 
   mainWindow.once('ready-to-show', () => {
     mainWindow?.show()
+    if (app.isPackaged) void checkForAppUpdates()
   })
 }
 
 
 app.whenReady().then(() => {
   initializeDatabase()
+
   registerWhatsAppIpc()
   registerProspectsIpc()
+  registerUpdaterIpc()
+  
   createWindow()
   
 

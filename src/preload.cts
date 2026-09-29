@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import type { NewProspect, UpdateProspect } from './types/prospects.js'
+import type { AppUpdateState } from './types/updater.js'
 
 contextBridge.exposeInMainWorld('api', {
   getProspects: () => ipcRenderer.invoke('prospects:get'),
@@ -16,4 +17,14 @@ contextBridge.exposeInMainWorld('api', {
   getLegalDocument: (documentId: 'privacy' | 'terms') =>
     ipcRenderer.invoke('legal:get', documentId),
   toggleFullscreen: () => ipcRenderer.invoke('window:toggle-fullscreen'),
+  quitApp: () => ipcRenderer.invoke('app:quit'),
+  getUpdateState: (): Promise<AppUpdateState> => ipcRenderer.invoke('updates:get-state'),
+  checkForUpdates: (): Promise<AppUpdateState> => ipcRenderer.invoke('updates:check'),
+  downloadUpdate: (): Promise<AppUpdateState> => ipcRenderer.invoke('updates:download'),
+  installUpdate: (): Promise<boolean> => ipcRenderer.invoke('updates:install'),
+  onUpdateState: (callback: (state: AppUpdateState) => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, state: AppUpdateState) => callback(state)
+    ipcRenderer.on('updates:state', listener)
+    return () => ipcRenderer.removeListener('updates:state', listener)
+  },
 })

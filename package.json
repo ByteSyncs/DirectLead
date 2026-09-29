@@ -1,6 +1,6 @@
 {
   "name": "DirectLead",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "productName": "DirectLead",
   "description": "Desktop application to organize prospects and prepare outreach messages.",
   "main": "./dist/main.js",
@@ -9,7 +9,7 @@
     "build": "tsc && pnpm build:css && pnpm copy:renderer",
     "build:css": "pnpm exec tailwindcss -i ./src/renderer/input.css -o ./dist/renderer/styles.css",
     "copy:renderer": "node scripts/copy-renderer.mjs",
-    "package:win": "pnpm build && electron-builder --win nsis --x64",
+    "package:win": "pnpm build && electron-builder --win nsis --x64 --publish never",
     "package:win:dir": "pnpm build && electron-builder --win dir --x64",
     "postinstall": "electron-builder install-app-deps",
     "watch": "tsc --watch",
@@ -50,6 +50,7 @@
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",
+    "electron-updater": "^6.8.9",
     "marked": "^18.0.14"
   },
   "build": {
@@ -62,6 +63,14 @@
     "directories": {
       "output": "release"
     },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "ByteSyncs",
+        "repo": "DirectLead",
+        "releaseType": "release"
+      }
+    ],
     "files": [
       "dist/**/*",
       "package.json"

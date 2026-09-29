@@ -77,7 +77,7 @@ Las asignaciones se guardan localmente. La sección Atajos permite restaurar los
 - Al abrir WhatsApp, email o un link, los datos necesarios se entregan al servicio externo elegido. Se aplican las políticas de dicho servicio.
 - Desinstalar la aplicación puede no borrar los datos locales. Haz tus propias copias de seguridad y protege el acceso al equipo.
 
-Los documentos legales específicos están en [`docs/legal/privacy.md`](docs/legal/privacy.md) y [`docs/legal/terms.md`](docs/legal/terms.md). Son **borradores pendientes de revisión legal**, no asesoramiento jurídico ni documentos definitivos para publicación.
+Los documentos de privacidad y términos de uso propios de DirectLead están en [`docs/legal/privacy.md`](docs/legal/privacy.md) y [`docs/legal/terms.md`](docs/legal/terms.md). Al primer inicio, la aplicación solicita aceptar los Términos para continuar. La aceptación se guarda localmente por versión.
 
 Si en el futuro se añade almacenamiento remoto o sincronización, se deberá actualizar la app y su documentación para explicar el tratamiento antes de transmitir datos y solicitar aceptación expresa al usuario.
 
@@ -133,7 +133,7 @@ src/
   renderer/               Interfaz, controlador y estilos Tailwind
   services/               Servicios de aplicación
   types/                  Tipos compartidos y API de ventana
-docs/legal/               Borradores de privacidad y términos de DirectLead
+  docs/legal/               Política de privacidad y términos de uso de DirectLead
 scripts/                  Copia de recursos al directorio dist
 ```
 

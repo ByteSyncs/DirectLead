@@ -1,8 +1,6 @@
 # Política de Privacidad de DirectLead
 
-**Estado:** Borrador para revisión legal. No publicar como versión definitiva sin validar la identidad del responsable, la distribución de la aplicación y la legislación aplicable.
-
-**Última actualización:** 28 de septiembre de 2026
+**Última actualización:** 29 de septiembre de 2026
 
 ## 1. Alcance
 
@@ -14,7 +12,7 @@ Si una versión futura ofrece guardar o sincronizar información en una base de 
 
 ## 2. Responsable y roles
 
-DirectLead es desarrollada y distribuida bajo la marca ByteSyncs, operada por Ezequiel Saucedo, con domicilio informado en Buenos Aires, Argentina. Contacto: [info@bytesyncs.com](mailto:info@bytesyncs.com).
+DirectLead es desarrollada y distribuida por Ezequiel Saucedo, quien asume la responsabilidad de la aplicación, bajo la marca ByteSyncs. Domicilio declarado: Buenos Aires, Argentina. Contacto: [info@bytesyncs.com](mailto:info@bytesyncs.com).
 
 La persona o empresa que instala y utiliza DirectLead decide qué prospectos registra y para qué los contacta. Esa persona o empresa es responsable de contar con una base legítima para recopilar y utilizar los datos de sus contactos, informarles cuando corresponda y atender sus solicitudes. ByteSyncs no recibe automáticamente el contenido de la base local ni determina esos fines.
 
@@ -25,7 +23,7 @@ Según los datos que la persona usuaria ingrese, DirectLead puede guardar:
 - Nombre del negocio, teléfono, email y enlace asociado.
 - Mensaje de contacto y notas.
 - Fecha de contacto y marcas de creación y actualización del registro.
-- Preferencias, como el nombre del negocio propio, plantillas, canal de WhatsApp, asunto y remitente de email, atajos de teclado y ancho de la lista.
+- Preferencias, como el nombre del negocio propio, plantillas, canal de WhatsApp, asunto y remitente de email, atajos de teclado, ancho de la lista y versión de los Términos aceptada.
 
 La persona usuaria debe evitar guardar datos sensibles o información que no sea necesaria para su actividad.
 
@@ -33,7 +31,7 @@ La persona usuaria debe evitar guardar datos sensibles o información que no sea
 
 Los prospectos se almacenan en una base SQLite local llamada `directlead.db`, dentro del directorio de datos de usuario que administra Electron en el dispositivo. Las preferencias se guardan en el almacenamiento local del perfil de la aplicación.
 
-Los registros permanecen hasta que la persona usuaria los elimina desde DirectLead o elimina los datos locales de la aplicación en el sistema operativo. Desinstalar la aplicación puede no borrar ese directorio. La persona usuaria es responsable de proteger el dispositivo y de realizar sus propias copias de seguridad; DirectLead no ofrece actualmente una copia en la nube ni recuperación remota.
+Los registros permanecen hasta que la persona usuaria los elimina desde DirectLead o elimina los datos locales de la aplicación en el sistema operativo. La aceptación de los Términos se recuerda localmente mediante su versión; no se envía a ByteSyncs. Desinstalar la aplicación puede no borrar el directorio de datos. La persona usuaria es responsable de proteger el dispositivo y de realizar sus propias copias de seguridad; DirectLead no ofrece actualmente una copia en la nube ni recuperación remota.
 
 ## 5. Uso de la información
 
@@ -53,6 +51,8 @@ Esos terceros procesan la información conforme a sus propias políticas y condi
 
 DirectLead no envía automáticamente la base local a ByteSyncs. Si la persona usuaria comparte voluntariamente información con ByteSyncs —por ejemplo, al solicitar soporte— esa información se tratará para responder la consulta. No envíes la base de prospectos completa salvo que sea estrictamente necesario y hayas eliminado o protegido los datos de terceros.
 
+El soporte se solicita por email a [info@bytesyncs.com](mailto:info@bytesyncs.com). ByteSyncs procura responder normalmente dentro de las 48 horas; en períodos de alta demanda el plazo puede extenderse.
+
 ## 8. Seguridad
 
 Los datos se guardan en el dispositivo y su protección depende también de la seguridad del sistema operativo, la cuenta de usuario, el almacenamiento y las copias de respaldo. Ningún método de almacenamiento garantiza seguridad absoluta. Se recomienda mantener el dispositivo actualizado y protegido mediante bloqueo de acceso.
@@ -63,6 +63,10 @@ Las solicitudes relacionadas con datos que una persona usuaria guardó en su pro
 
 Cuando corresponda la legislación argentina de protección de datos personales, podrán resultar aplicables los derechos de acceso, rectificación, actualización y supresión previstos por la Ley 25.326 y sus normas complementarias. La aplicación no puede ejercer esos derechos por cuenta de cada persona usuaria respecto de los prospectos que esta registra.
 
-## 10. Cambios y nuevas funciones
+## 10. Edad y distribución
+
+DirectLead puede descargarse desde Internet en distintos países y no solicita ni comprueba la edad de quien la utiliza. No se establece una edad mínima propia para la aplicación. Las personas usuarias deben cumplir las leyes locales; cuando corresponda, las personas menores de edad deberán contar con la autorización o supervisión de su madre, padre o tutor.
+
+## 11. Cambios y nuevas funciones
 
 Esta política debe actualizarse si DirectLead incorpora cuentas, sincronización, analítica, copias en la nube, nuevos proveedores o cualquier otro tratamiento distinto del descrito. La fecha de actualización se modificará junto con cada cambio sustancial. Si se incorpora sincronización remota, también se informará cómo retirar el consentimiento y cómo solicitar la eliminación de las copias remotas, cuando corresponda.

@@ -20,6 +20,9 @@ const defaults = {
   }
 }
 
+const TERMS_ACCEPTANCE_KEY = 'directlead-accepted-terms-version'
+const TERMS_VERSION = '2026-09-29'
+
 const SHORTCUTS = [
   { id: 'newProspect', title: 'Nuevo prospecto', description: 'Abre el formulario para crear un prospecto.', group: 'Acciones' },
   { id: 'openPalette', title: 'Búsqueda rápida', description: 'Busca acciones y prospectos.', group: 'Acciones' },
@@ -51,7 +54,13 @@ const state = {
   search: '', selectedSettingId: 'messages', messageChannel: 'whatsapp',
   mobile: window.matchMedia('(max-width: 800px)').matches,
   mobileScreen: 'list', paletteIndex: 0, shortcutCapture: null,
-  legalRequestId: 0, settings: loadSettings()
+  legalRequestId: 0,
+  update: {
+    status: 'idle', currentVersion: '', version: null,
+    releaseNotes: '', percent: 0, error: null
+  },
+  termsGateActive: localStorage.getItem(TERMS_ACCEPTANCE_KEY) !== TERMS_VERSION,
+  settings: loadSettings()
 }
 
 const variables = [
@@ -67,7 +76,8 @@ const $ = (selector) => {
 }
 
 const elements = {
-  app: $('#app-root'), railProspects: $('#rail-prospects'), railSettings: $('#rail-settings'),
+  app: $('#app-root'), railProspects: $('#rail-prospects'), railUpdates: $('#rail-updates'),
+  updateBadge: $('#update-badge'), railSettings: $('#rail-settings'),
   listPane: $('#list-pane'), viewProspects: $('#view-prospects'), viewSettings: $('#view-settings'),
   prospectList: $('#prospect-list'), emptyList: $('#empty-list'),
   prospectCount: $('#prospect-count'), listStatus: $('#list-status'), search: $('#search-input'),
@@ -91,7 +101,11 @@ const elements = {
   palette: $('#palette-backdrop'), paletteInput: $('#palette-input'),
   paletteResults: $('#palette-results'), legalModal: $('#legal-backdrop'),
   legalTitle: $('#legal-title'), legalClose: $('#legal-close'),
-  legalContent: $('#legal-content'), toast: $('#toast')
+  legalContent: $('#legal-content'), legalFooterClose: $('#legal-footer-close'),
+  termsFooter: $('#terms-footer'), termsConsent: $('#terms-consent'),
+  termsCheckbox: $('#terms-checkbox'), termsPrivacy: $('#terms-privacy'),
+  termsReturn: $('#terms-return'), termsReject: $('#terms-reject'),
+  termsAccept: $('#terms-accept'), toast: $('#toast')
 }
 
 function escapeHtml(value = '') {
@@ -189,7 +203,10 @@ function renderDetail() {
   elements.detailPhone.textContent = prospect.phone || 'Sin teléfono'
   elements.detailEmail.textContent = prospect.email || 'Sin email'
   elements.detailUrl.textContent = prospect.url || ''
-  elements.detailMessage.textContent = prospect.message || ''
+  elements.detailMessage.textContent = renderTemplate(
+    prospect.message || state.settings.whatsappTemplate,
+    prospect
+  )
   elements.detailNotes.textContent = prospect.notes || ''
   elements.infoCreated.textContent = formatDate(prospect.created_at)
   elements.infoContacted.textContent = formatDate(prospect.contacted_at, true)
@@ -204,18 +221,28 @@ function renderDetail() {
 
 function renderRail() {
   const settings = state.view === 'settings'
-  for (const [button, active] of [[elements.railProspects, !settings], [elements.railSettings, settings]]) {
+  const updates = settings && state.selectedSettingId === 'updates'
+  const configuration = settings && !updates
+  const updateAvailable = ['available', 'downloading', 'downloaded'].includes(state.update.status)
+  for (const [button, active] of [[elements.railProspects, !settings], [elements.railSettings, configuration]]) {
     button.classList.toggle('bg-paper-light', active)
     button.classList.toggle('text-accent', active)
     button.classList.toggle('text-text-muted', !active)
     button.querySelector('[data-rail-marker]').classList.toggle('hidden', !active)
   }
+  elements.railUpdates.classList.toggle('bg-paper-light', updates)
+  elements.railUpdates.classList.toggle('text-[#f0c75e]', updateAvailable)
+  elements.railUpdates.classList.toggle('text-accent', updates && !updateAvailable)
+  elements.railUpdates.classList.toggle('text-text-muted', !updates && !updateAvailable)
+  elements.railUpdates.querySelector('[data-rail-marker]').classList.toggle('hidden', !updates)
+  elements.updateBadge.hidden = !updateAvailable
 }
 
 function renderSettingsList() {
   const sections = [
     ['messages', 'Configuración de Mensajes', 'Plantillas y canales'],
     ['shortcuts', 'Atajos', 'Personaliza el teclado'],
+    ['updates', 'Actualizaciones', updateSettingsSubtitle()],
     ['help', 'Ayuda', 'Respuestas de uso'],
     ['about', 'Acerca de', 'Información de la aplicación'],
   ]
@@ -223,6 +250,90 @@ function renderSettingsList() {
     <button type="button" data-setting-id="${id}" class="flex w-full items-center justify-between gap-3 rounded-lg px-4 py-3 text-left transition ${id === state.selectedSettingId ? 'bg-paper-light text-text' : 'text-text-soft hover:bg-paper-light/70'}">
       <span><span class="block text-[12px]">${title}</span><span class="mt-1 block text-[10px] text-text-muted">${subtitle}</span></span><span class="text-text-muted" aria-hidden="true">›</span>
     </button>`).join('')
+}
+
+function updateSettingsSubtitle() {
+  if (state.update.status === 'available') return `Nueva versión ${state.update.version}`
+  if (state.update.status === 'downloaded') return 'Actualización lista para instalar'
+  if (state.update.status === 'checking') return 'Buscando actualizaciones...'
+  if (state.update.status === 'up-to-date') return 'Estás al día'
+  if (state.update.status === 'development') return 'Consulta disponible en la app instalada'
+  return 'Versión y notas de lanzamiento'
+}
+
+function renderUpdates() {
+  const update = state.update
+  const headings = {
+    idle: 'Comprobar actualizaciones',
+    checking: 'Buscando una nueva versión...',
+    'up-to-date': 'DirectLead está actualizado',
+    available: `DirectLead ${update.version} está disponible`,
+    downloading: 'Descargando actualización',
+    downloaded: `DirectLead ${update.version} está lista para instalar`,
+    error: 'No se pudo comprobar si hay actualizaciones',
+    development: 'Actualizaciones disponibles en la app instalada'
+  }
+  const descriptions = {
+    idle: `Versión instalada: ${update.currentVersion || 'desconocida'}. Puedes buscar una versión nueva.`,
+    checking: 'Consultando los releases oficiales de DirectLead en GitHub.',
+    'up-to-date': `Tienes instalada la versión ${update.currentVersion}.`,
+    available: `Tu versión es ${update.currentVersion}. La nueva versión ${update.version} incluye las notas que aparecen abajo.`,
+    downloading: `Descargando la versión ${update.version}. No cierres la aplicación.`,
+    downloaded: `La versión ${update.version} ya se descargó. Reinicia DirectLead para completar la actualización.`,
+    error: update.error || 'Comprueba tu conexión e inténtalo de nuevo.',
+    development: 'Las actualizaciones se consultan desde el instalador publicado; este control solo funciona en una versión instalada.'
+  }
+  const available = update.status === 'available'
+  const downloading = update.status === 'downloading'
+  const downloaded = update.status === 'downloaded'
+  const upToDate = update.status === 'up-to-date'
+  const notes = update.releaseNotes?.trim()
+
+  elements.settingsDetail.innerHTML = `
+    <div class="w-full max-w-[900px]">
+      <p class="text-[10px] font-semibold uppercase tracking-[0.16em] text-text-muted">DIRECTLEAD</p>
+      <h2 class="mt-2 font-serif text-[26px] text-text">Actualizaciones</h2>
+      <section class="mt-7 border-y border-line py-6" aria-live="polite">
+        <p class="text-[10px] font-semibold uppercase tracking-[0.12em] ${available || downloaded ? 'text-[#f0c75e]' : 'text-text-muted'}">${update.status === 'available' ? 'NUEVA VERSIÓN' : update.status === 'downloaded' ? 'LISTA PARA INSTALAR' : 'ESTADO'}</p>
+        <h3 class="mt-2 text-[15px] font-medium text-text">${escapeHtml(headings[update.status] || headings.idle)}</h3>
+        <p class="mt-2 text-[12px] leading-6 text-text-soft">${escapeHtml(descriptions[update.status] || descriptions.idle)}</p>
+        ${downloading ? `
+          <div class="mt-5 h-1.5 overflow-hidden rounded-full bg-paper-light" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(update.percent)}">
+            <div class="h-full bg-accent transition-[width]" style="width: ${Math.max(0, Math.min(100, update.percent))}%"></div>
+          </div>
+          <p class="mt-2 text-[10px] text-text-muted">${Math.round(update.percent)}%</p>` : ''}
+        <div class="mt-5 flex flex-wrap gap-2">
+          ${available ? '<button type="button" data-update-action="download" class="min-h-[36px] rounded-[7px] border border-accent bg-accent px-4 text-[11px] font-semibold text-[#171812] transition hover:bg-[#c8d5af]">Descargar actualización</button>' : ''}
+          ${downloaded ? '<button type="button" data-update-action="install" class="min-h-[36px] rounded-[7px] border border-accent bg-accent px-4 text-[11px] font-semibold text-[#171812] transition hover:bg-[#c8d5af]">Reiniciar e instalar</button>' : ''}
+          ${!downloading && !downloaded && update.status !== 'development' ? `<button type="button" data-update-action="check" ${update.status === 'checking' ? 'disabled' : ''} class="min-h-[36px] rounded-[7px] border border-line px-4 text-[11px] text-text-soft transition hover:border-[#42423a] hover:bg-paper-light hover:text-text disabled:opacity-40">Buscar actualizaciones</button>` : ''}
+        </div>
+      </section>
+      ${available || downloaded || (upToDate && notes) ? `
+        <section class="mt-7">
+          <h3 class="text-[10px] font-semibold uppercase tracking-[0.14em] text-text-muted">${upToDate ? 'RELEASE INSTALADO' : 'NOVEDADES DE LA VERSIÓN'} ${escapeHtml(update.version || '')}</h3>
+          <pre class="mt-3 whitespace-pre-wrap font-sans text-[12px] leading-6 text-text-soft">${escapeHtml(notes || 'Este release no incluye notas adicionales.')}</pre>
+        </section>` : ''}
+      ${update.status === 'error' ? '<p class="mt-5 text-[10px] leading-5 text-text-muted">La consulta de actualizaciones solo contacta GitHub para buscar releases. Tus prospectos no se envían.</p>' : ''}
+    </div>`
+}
+
+async function runUpdateAction(action) {
+  try {
+    if (action === 'check') state.update = await window.api.checkForUpdates()
+    if (action === 'download') state.update = await window.api.downloadUpdate()
+    if (action === 'install') {
+      await window.api.installUpdate()
+      return
+    }
+    renderRail()
+    renderSettingsList()
+    if (state.view === 'settings' && state.selectedSettingId === 'updates') renderUpdates()
+  } catch (error) {
+    console.error(error)
+    state.update = { ...state.update, status: 'error', error: 'No se pudo completar la acción. Inténtalo otra vez.' }
+    renderRail()
+    if (state.view === 'settings' && state.selectedSettingId === 'updates') renderUpdates()
+  }
 }
 
 function variableButtons() {
@@ -281,7 +392,7 @@ function renderAbout() {
         <div class="grid gap-x-10 sm:grid-cols-2">
           <div class="border-b border-line py-4">
             <p class="text-[10px] uppercase tracking-[0.12em] text-text-muted">Versión</p>
-            <p class="mt-1 text-[12px] text-text">1.0.0</p>
+            <p class="mt-1 text-[12px] text-text">${escapeHtml(state.update.currentVersion || 'Desconocida')}</p>
           </div>
           <div class="border-b border-line py-4">
             <p class="text-[10px] uppercase tracking-[0.12em] text-text-muted">Plataforma</p>
@@ -521,6 +632,7 @@ function renderSettings() {
   if (state.selectedSettingId === 'about') renderAbout()
   else if (state.selectedSettingId === 'help') renderHelp()
   else if (state.selectedSettingId === 'shortcuts') renderShortcuts()
+  else if (state.selectedSettingId === 'updates') renderUpdates()
   else renderMessageSettings()
   elements.settingsDetail.scrollTop = 0
 }
@@ -579,7 +691,9 @@ function openModal(prospect = null) {
   elements.formEmail.value = prospect?.email ?? ''
   elements.formContacted.value = toLocalDateTime(prospect?.contacted_at)
   elements.formUrl.value = prospect?.url ?? ''
-  elements.formMessage.value = prospect?.message ?? state.settings.whatsappTemplate
+  elements.formMessage.value = prospect
+    ? renderTemplate(prospect.message || state.settings.whatsappTemplate, prospect)
+    : state.settings.whatsappTemplate
   elements.formNotes.value = prospect?.notes ?? ''
   elements.modalLabel.textContent = prospect ? 'EDITAR' : 'NUEVO'
   elements.modalTitle.textContent = prospect ? 'Editar prospecto' : 'Nuevo prospecto'
@@ -650,7 +764,8 @@ function renderTemplate(template, prospect) {
 function buildWhatsAppUrl(prospect) {
   const phone = String(prospect.phone || '').replace(/\D/g, '')
   if (!phone) return null
-  const text = encodeURIComponent(renderTemplate(state.settings.whatsappTemplate, prospect))
+  const message = prospect.message || state.settings.whatsappTemplate
+  const text = encodeURIComponent(renderTemplate(message, prospect))
   return state.settings.whatsappOpenWith === 'desktop'
     ? `whatsapp://send?phone=${phone}&text=${text}` : `https://wa.me/${phone}?text=${text}`
 }
@@ -724,19 +839,38 @@ const legalTitles = {
   terms: 'Términos de Uso de DirectLead'
 }
 
-async function openLegalDocument(documentId) {
+async function openLegalDocument(documentId, { termsGate = false } = {}) {
   if (!Object.hasOwn(legalTitles, documentId)) return
   const requestId = ++state.legalRequestId
+  state.termsGateActive = termsGate
+  elements.app.inert = termsGate
   elements.legalTitle.textContent = legalTitles[documentId]
   elements.legalContent.innerHTML = '<p class="text-[12px] text-text-muted">Cargando documento...</p>'
+  setVisible(elements.legalClose, !termsGate, 'grid')
+  setVisible(elements.legalFooterClose, !termsGate)
+  setVisible(elements.termsFooter, termsGate)
+  setVisible(elements.termsConsent, termsGate && documentId === 'terms')
+  setVisible(elements.termsPrivacy, termsGate && documentId === 'terms')
+  setVisible(elements.termsReturn, termsGate && documentId === 'privacy')
+  elements.termsCheckbox.checked = false
+  elements.termsCheckbox.disabled = termsGate
+  elements.termsAccept.disabled = true
+  setVisible(elements.termsAccept, termsGate && documentId === 'terms')
   setVisible(elements.legalModal, true, 'grid')
-  requestAnimationFrame(() => elements.legalClose.focus())
+  requestAnimationFrame(() => {
+    if (termsGate) elements.termsReject.focus()
+    else elements.legalClose.focus()
+  })
 
   try {
     const html = await window.api.getLegalDocument(documentId)
     if (requestId !== state.legalRequestId || elements.legalModal.hidden) return
     elements.legalContent.innerHTML = html
     elements.legalContent.scrollTop = 0
+    if (termsGate && documentId === 'terms') {
+      elements.termsCheckbox.disabled = false
+      elements.termsAccept.disabled = !elements.termsCheckbox.checked
+    }
   } catch (error) {
     console.error(error)
     if (requestId !== state.legalRequestId) return
@@ -745,8 +879,21 @@ async function openLegalDocument(documentId) {
 }
 
 function closeLegalDocument() {
+  if (state.termsGateActive) return
   state.legalRequestId += 1
   setVisible(elements.legalModal, false)
+}
+
+function acceptTerms() {
+  if (!state.termsGateActive || elements.termsCheckbox.disabled || !elements.termsCheckbox.checked) return
+  localStorage.setItem(TERMS_ACCEPTANCE_KEY, TERMS_VERSION)
+  state.termsGateActive = false
+  elements.app.inert = false
+  closeLegalDocument()
+}
+
+function rejectTerms() {
+  if (state.termsGateActive) window.api.quitApp()
 }
 
 function paletteItems() {
@@ -754,6 +901,7 @@ function paletteItems() {
     { id: 'new', label: 'Nuevo prospecto', kind: 'Acción' },
     { id: 'messages', label: 'Configuración de Mensajes', kind: 'Configuración' },
     { id: 'shortcuts', label: 'Atajos de teclado', kind: 'Configuración' },
+    { id: 'updates', label: 'Actualizaciones', kind: 'Sistema' },
     { id: 'help', label: 'Ayuda', kind: 'Configuración' },
     { id: 'about', label: 'Acerca de', kind: 'Configuración' },
     { id: 'privacy', label: 'Privacidad de DirectLead', kind: 'Legal' },
@@ -785,6 +933,7 @@ function runCommand(id) {
   if (id === 'about') return openSettings('about')
   if (id === 'help') return openSettings('help')
   if (id === 'shortcuts') return openSettings('shortcuts')
+  if (id === 'updates') return openSettings('updates')
   if (id === 'privacy' || id === 'terms') return openLegalDocument(id)
   if (id === 'prospects') return closeSettings()
   if (id.startsWith('prospect:')) {
@@ -834,6 +983,7 @@ function updateSetting(target) {
 
 elements.newButton.addEventListener('click', () => openModal())
 elements.railProspects.addEventListener('click', closeSettings)
+elements.railUpdates.addEventListener('click', () => openSettings('updates'))
 elements.railSettings.addEventListener('click', () => openSettings('messages'))
 elements.search.addEventListener('input', (event) => {
   state.search = event.target.value
@@ -855,6 +1005,12 @@ elements.settingsDetail.addEventListener('input', (event) => {
 })
 elements.settingsDetail.addEventListener('change', (event) => updateSetting(event.target))
 elements.settingsDetail.addEventListener('click', (event) => {
+  const updateAction = event.target.closest('[data-update-action]')
+  if (updateAction) {
+    runUpdateAction(updateAction.dataset.updateAction)
+    return
+  }
+
   const legalButton = event.target.closest('[data-legal-open]')
   if (legalButton) {
     openLegalDocument(legalButton.dataset.legalOpen)
@@ -977,8 +1133,16 @@ elements.palette.addEventListener('click', (event) => {
   if (event.target === elements.palette) closePalette()
 })
 elements.legalClose.addEventListener('click', closeLegalDocument)
+elements.legalFooterClose.addEventListener('click', closeLegalDocument)
+elements.termsCheckbox.addEventListener('change', () => {
+  elements.termsAccept.disabled = !elements.termsCheckbox.checked
+})
+elements.termsPrivacy.addEventListener('click', () => openLegalDocument('privacy', { termsGate: true }))
+elements.termsReturn.addEventListener('click', () => openLegalDocument('terms', { termsGate: true }))
+elements.termsAccept.addEventListener('click', acceptTerms)
+elements.termsReject.addEventListener('click', rejectTerms)
 elements.legalModal.addEventListener('click', (event) => {
-  if (event.target === elements.legalModal || event.target.closest('[data-legal-close]')) {
+  if (!state.termsGateActive && (event.target === elements.legalModal || event.target.closest('[data-legal-close]'))) {
     closeLegalDocument()
   }
 })
@@ -988,6 +1152,23 @@ elements.legalContent.addEventListener('click', (event) => {
   event.preventDefault()
   openExternal(link.href)
 })
+
+window.api.onUpdateState((update) => {
+  state.update = update
+  renderRail()
+  renderSettingsList()
+  if (state.view === 'settings' && state.selectedSettingId === 'updates') renderUpdates()
+})
+
+window.api.getUpdateState().then((update) => {
+  state.update = update
+  renderRail()
+  renderSettingsList()
+  if (state.view === 'settings' && state.selectedSettingId === 'updates') renderUpdates()
+}).catch((error) => {
+  console.error('No se pudo leer el estado de actualizaciones.', error)
+})
+
 elements.mobileBack.addEventListener('click', () => {
   state.mobileScreen = 'list'
   render()
@@ -1037,6 +1218,7 @@ document.addEventListener('keydown', (event) => {
     window.api.toggleFullscreen()
     return
   }
+  if (state.termsGateActive) return
   if (shortcutMatches(event, 'openPalette')) {
     event.preventDefault()
     openPalette()
@@ -1075,4 +1257,5 @@ window.addEventListener('resize', () => {
 
 const savedWidth = localStorage.getItem('directlead-list-width')
 if (savedWidth) elements.listPane.style.width = savedWidth
+if (state.termsGateActive) openLegalDocument('terms', { termsGate: true })
 loadProspects()
